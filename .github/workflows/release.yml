@@ -1,12 +1,11 @@
 name: Build Magisk Module
 
-permissions:
-  contents: write
-
 on:
   release:
-    types: [published]
-  workflow_dispatch:
+    types: [published]   # Важно! Не используйте workflow_dispatch для загрузки в релиз
+
+permissions:
+  contents: write        # Глобальные права
 
 jobs:
   build:
@@ -14,28 +13,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Generate hash file for integrity check
-        run: |
-          # Создаём временный список файлов, исключая служебные
-          find . -type f \
-            ! -path './.git/*' \
-            ! -name '.gitignore' \
-            ! -name '*.yml' \
-            ! -name 'hash' \
-            ! -name 'verify.sh' \
-            -printf '%P\0' | while IFS= read -r -d '' file; do
-              sha256sum "$file" | awk '{print $2 "|" $1}'
-          done > hash
-          # Добавляем сам verify.sh (если хотим его тоже проверять)
-          sha256sum verify.sh | awk '{print $2 "|" $1}' >> hash 2>/dev/null || true
-
-      - name: Create Magisk ZIP
+      - name: Create ZIP
         run: |
           zip -r QuietKill224-${{ github.ref_name }}.zip . \
-            -x '*.git*' \
-            -x '*.github/*' \
-            -x '.gitignore' \
-            -x '*.yml'
+            -x '*.git*' '*.github/*' '.gitignore' '*.yml'
 
       - name: Upload to release
         uses: softprops/action-gh-release@v2
