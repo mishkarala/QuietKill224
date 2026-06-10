@@ -2,8 +2,7 @@ name: Build Magisk Module with Hash
 
 on:
   release:
-    types: [published]      # Автоматически при публикации релиза
-  workflow_dispatch:        # Можно запустить и вручную (но архив прикрепится только если есть релиз)
+    types: [published]      # Сработает только когда вы опубликуете релиз через интерфейс GitHub
 
 permissions:
   contents: write
@@ -15,32 +14,27 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Generate hash file for integrity check
+      - name: Generate hash file
         run: |
-          # Создаём файл hash в формате "относительный_путь|sha256"
-          # Исключаем служебные файлы и папки
           find . -type f \
             ! -path './.git/*' \
             ! -name '.gitignore' \
             ! -name '*.yml' \
             ! -name 'hash' \
-            ! -name 'release.json' \
             -printf '%P\0' | while IFS= read -r -d '' file; do
               sha256sum "$file" | awk '{print $2 "|" $1}'
           done > hash
-          echo "Hash file generated:"
-          cat hash
+          echo "Hash file generated"
 
-      - name: Create Magisk-compatible ZIP (flat structure)
+      - name: Create Magisk ZIP
         run: |
-          # Упаковываем всё содержимое текущей папки без родительской папки
           zip -r QuiteKill-${{ github.ref_name }}.zip . \
             -x '*.git*' \
             -x '.github/*' \
             -x '.gitignore' \
             -x '*.yml'
 
-      - name: Upload ZIP to release
+      - name: Upload to release
         uses: softprops/action-gh-release@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
