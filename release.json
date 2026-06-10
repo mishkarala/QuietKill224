@@ -1,0 +1,10 @@
+{
+  "id": "QuiteKill",
+  "name": "Quite Kill 🤫🔪",
+  "versionName": "v5",
+  "versionCode": 500,
+  "author": "Resbet",
+  "description": "Kills background apps on screen lock via power button.",
+  "supportedDevices": ["android12", "android13", "android14"],
+  "releaseDate": "2026-10-06"
+}
