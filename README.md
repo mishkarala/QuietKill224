@@ -1,5 +1,5 @@
-# QuiteKill Module
-
+# QuiteKill Module я епал как этот хэш сделать. эта штука не рабочая
+ 
 QuiteKill is a KernelSU/Magisk module that force-stops background apps to free memory, save battery, and keep your device smooth. It can be triggered automatically when you lock your device using power button or controlled manually through a built-in WebUI.
 
 
