@@ -1,33 +1,44 @@
+name: Build Magisk Module
 
-name: Create Module ZIP and Release
+permissions:
+  contents: write
 
 on:
   release:
     types: [published]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: write   
-
     steps:
-
       - uses: actions/checkout@v4
 
-      - name: Create ZIP archive
-        uses: thedoctor0/zip-release@0.7.6
-        with:
-          type: 'zip'
-          filename: 'QuietKill224-${{ github.ref_name }}.zip'
-          exclusions: | 
-            *.git*
-            *.github*
-            *.gitignore
+      - name: Generate hash file for integrity check
+        run: |
+          # Создаём временный список файлов, исключая служебные
+          find . -type f \
+            ! -path './.git/*' \
+            ! -name '.gitignore' \
+            ! -name '*.yml' \
+            ! -name 'hash' \
+            ! -name 'verify.sh' \
+            -printf '%P\0' | while IFS= read -r -d '' file; do
+              sha256sum "$file" | awk '{print $2 "|" $1}'
+          done > hash
+          # Добавляем сам verify.sh (если хотим его тоже проверять)
+          sha256sum verify.sh | awk '{print $2 "|" $1}' >> hash 2>/dev/null || true
 
+      - name: Create Magisk ZIP
+        run: |
+          zip -r QuietKill224-${{ github.ref_name }}.zip . \
+            -x '*.git*' \
+            -x '*.github/*' \
+            -x '.gitignore' \
+            -x '*.yml'
 
-      - name: Upload release asset
+      - name: Upload to release
         uses: softprops/action-gh-release@v2
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           files: QuietKill224-${{ github.ref_name }}.zip
