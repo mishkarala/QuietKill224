@@ -1,5 +1,5 @@
 
-name: Create ZIP and Release
+name: Create Module ZIP and Release
 
 on:
   release:
@@ -8,16 +8,26 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write   
+
     steps:
+
       - uses: actions/checkout@v4
 
       - name: Create ZIP archive
-        run: |
-          mkdir -p ${{ github.event.repository.name }}
-          rsync -av --progress ./ ${{ github.event.repository.name }}/ --exclude .git --exclude .github
-          zip -r ${{ github.event.repository.name }}-${{ github.ref_name }}.zip ${{ github.event.repository.name }}
+        uses: thedoctor0/zip-release@0.7.6
+        with:
+          type: 'zip'
+          filename: 'QuietKill224-${{ github.ref_name }}.zip'
+          exclusions: | 
+            *.git*
+            *.github*
+            *.gitignore
 
-      - name: Upload artifact to release
+
+      - name: Upload release asset
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ github.event.repository.name }}-${{ github.ref_name }}.zip
+          files: QuietKill224-${{ github.ref_name }}.zip
