@@ -2,7 +2,7 @@ name: Build Magisk Module with Hash
 
 on:
   release:
-    types: [published]      # Сработает только когда вы опубликуете релиз через интерфейс GitHub
+    types: [published]
 
 permissions:
   contents: write
@@ -24,7 +24,6 @@ jobs:
             -printf '%P\0' | while IFS= read -r -d '' file; do
               sha256sum "$file" | awk '{print $2 "|" $1}'
           done > hash
-          echo "Hash file generated"
 
       - name: Create Magisk ZIP
         run: |
