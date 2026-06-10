@@ -1,35 +1,23 @@
-name: MEOW CI
+
+name: Create ZIP and Release
 
 on:
-  workflow_dispatch:
-  push:
-    branches: main
-    paths-ignore: '**.md'
-  pull_request:
-    branches: main
-    paths-ignore: '**.md'
+  release:
+    types: [published]
 
 jobs:
   build:
-
-    runs-on: macos-15
-
+    runs-on: ubuntu-latest
     steps:
-    - name: Check out
-      uses: actions/checkout@v4
-      with:
-        submodules: 'recursive'
-        fetch-depth: 0
+      - uses: actions/checkout@v4
 
-    - name: Set up JDK
-      uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version: 21
+      - name: Create ZIP archive
+        run: |
+          mkdir -p ${{ github.event.repository.name }}
+          rsync -av --progress ./ ${{ github.event.repository.name }}/ --exclude .git --exclude .github
+          zip -r ${{ github.event.repository.name }}-${{ github.ref_name }}.zip ${{ github.event.repository.name }}
 
-    - name: Upload CI module zip as artifact zip
-      uses: actions/upload-artifact@v4
-      with:
-        name: Quiet-Kill-Module_@MeowDump_#${{ github.run_number }}
-        path: '*'
-        compression-level: 9
+      - name: Upload artifact to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ github.event.repository.name }}-${{ github.ref_name }}.zip
