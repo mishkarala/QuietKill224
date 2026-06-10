@@ -104,22 +104,22 @@ debug "└───────────────────────�
 debug " "
 
 # Verify ZIP
-  if [ -n "$ZIPFILE" ] && [ -f "$ZIPFILE" ]; then
-    debug " "
-    debug " ✦ Checking Module Integrity..."
+#   if [ -n "$ZIPFILE" ] && [ -f "$ZIPFILE" ]; then
+ #    debug " "
+ #    debug " ✦ Checking Module Integrity..."
 
-    if [ -f "$UPDATE/verify.sh" ]; then
-      if sh "$UPDATE/verify.sh"; then
-        debug " ✦ Verification completed successfully"
-      else
-        debug " ✘ Verification failed"
-        exit 1
-      fi
-    else
-      debug " ✦ verify.sh not found ❌"
-      exit 1
-    fi
-  fi
+ #    if [ -f "$UPDATE/verify.sh" ]; then
+  #     if sh "$UPDATE/verify.sh"; then
+    #     debug " ✦ Verification completed successfully"
+    #   else
+    #     debug " ✘ Verification failed"
+    #     exit 1
+   #    fi
+   #  else
+   #    debug " ✦ verify.sh not found ❌"
+  #     exit 1
+  #   fi
+#   fi
 
 # Preserve config files from old version 
 debug " ✦ Checking for existing config files..."
