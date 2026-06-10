@@ -17,6 +17,24 @@ SKIP_CRITICAL=1
 VERBOSE=1
 WILDCARD_IGNORE=0
 
+# Sync ignore.txt with ForceKill.txt for immediate effect
+sync_ignore_list() {
+    # Clear ForceKill.txt first (but keep it if it exists)
+    : > "$FORCE"
+    
+    if [ -f "$IGNORE" ]; then
+        # Read selected packages from ignore.txt and add them to ForceKill.txt
+        while IFS= read -r pkg; do
+            [ -n "$pkg" ] && echo "$pkg" >> "$FORCE"
+        done < "$IGNORE"
+        
+        log "Synced $(wc -l < "$IGNORE") packages from ignore.txt to ForceKill.txt"
+    fi
+}
+
+# Sync lists on module startup
+sync_ignore_list
+
 # Ensure directories exist
 mkdir -p "$LOGDIR" "$TMPDIR"
 
