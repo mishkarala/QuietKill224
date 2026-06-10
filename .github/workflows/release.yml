@@ -1,9 +1,11 @@
 name: Build Magisk Module with Hash
 
+# Событие для автоматического запуска при публикации релиза
 on:
   release:
     types: [published]
 
+# Предоставляем права GITHUB_TOKEN на запись в репозиторий
 permissions:
   contents: write
 
@@ -12,7 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        # Используем обновлённую версию v5
+        uses: actions/checkout@v5
 
       - name: Generate hash file
         run: |
@@ -24,6 +27,7 @@ jobs:
             -printf '%P\0' | while IFS= read -r -d '' file; do
               sha256sum "$file" | awk '{print $2 "|" $1}'
           done > hash
+          echo "Hash file generated"
 
       - name: Create Magisk ZIP
         run: |
@@ -34,7 +38,9 @@ jobs:
             -x '*.yml'
 
       - name: Upload to release
-        uses: softprops/action-gh-release@v2
+        # Используем обновлённую версию v3
+        uses: softprops/action-gh-release@v3
         with:
+          # Используем GITHUB_TOKEN, так как мы выдали ему права write
           token: ${{ secrets.GITHUB_TOKEN }}
           files: QuiteKill-${{ github.ref_name }}.zip
